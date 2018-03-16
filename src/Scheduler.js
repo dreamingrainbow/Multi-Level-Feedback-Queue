@@ -29,17 +29,27 @@ class Scheduler {
     // If yes, then break out of the infinite loop
     // Otherwise, perform another loop iteration
     run() {
-
+        
+        while(!this.allEmpty()){
+            const currentTime = Date.now();
+            const workTime = currentTime - this.clock;
+            this.clock =  Date.now();
+                  
+        }
     }
 
     // Checks that all queues have no processes 
     allEmpty() {
-
+        if (!this.blockingQueue.isEmpty()) return false;
+        for(let i = 0;  i < this.runningQueues.length; i++) {
+          if(!this.runningQueues[i].isEmpty()) return false;
+        }
+        return true;
     }
 
     // Adds a new process to the highest priority level running queue
     addNewProcess(process) {
-
+        this.runningQueues[0].enqueue(process); 
     }
 
     // The scheduler's interrupt handler that receives a queue, a process, and an interrupt string
@@ -49,7 +59,30 @@ class Scheduler {
     // If it is a running queue, add the process to the next lower priority queue, or back into itself if it is already in the lowest priority queue
     // If it is a blocking queue, add the process back to the blocking queue
     handleInterrupt(queue, process, interrupt) {
-
+        let level;
+        switch(interrupt){
+            case SchedulerInterrupt.PROCESS_BLOCKED:
+                
+                break;
+            case SchedulerInterrupt.PROCESS_READY:
+                
+                break;
+            case SchedulerInterrupt.LOWER_PRIORITY:
+                switch(queue.getQueueType()){
+                    case QueueType.CPU_QUEUE:
+                        level = queue.getPriorityLevel();
+                        level++;
+                        if(level > PRIORITY_LEVELS -1 ) {
+                            level =  PRIORITY_LEVELS -1;
+                        } 
+                        this.runningQueues[level].enqueue(process);
+                        break;
+                    case QueueType.BLOCKING_QUEUE:
+                        this.blockingQueue.enqueue(process)
+                        break;
+                }
+                break;
+        }
     }
 
     // Private function used for testing; DO NOT MODIFY
